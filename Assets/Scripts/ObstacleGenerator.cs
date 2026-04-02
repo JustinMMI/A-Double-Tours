@@ -52,7 +52,7 @@ public class ObstacleGenerator : MonoBehaviour
         {
             int floor = finalFloors[i];
             string towerName = floor <= 15 ? "Tour 1" : "Tour 2";
-            sentenceObstacle += "- " + selectedObstacles[i] + " -> " + towerName + ", étage " + floor + "\n";
+            sentenceObstacle += "- " + selectedObstacles[i] + " -> " + towerName + ", étage " + (floor <= 15 ? floor : floor - 15) + "\n";
         }
 
         _obstacleSentence = sentenceObstacle;
