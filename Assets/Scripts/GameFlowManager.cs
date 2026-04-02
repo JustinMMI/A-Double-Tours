@@ -69,6 +69,15 @@ public class GameFlowManager : MonoBehaviour
     public void OnBobClicked()
     {
         int randomIndex = Random.Range(0, randomEvents.Length);
+
+        while (randomIndex == lastEventIndex)
+        {
+            randomIndex = Random.Range(0, randomEvents.Length);
+        }
+
+        lastEventIndex = randomIndex;
         bobText.text = randomEvents[randomIndex];
     }
+
+    private int lastEventIndex = -1;
 }
