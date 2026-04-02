@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class MenuManager : MonoBehaviour
 {
     public List<PionSelector> allPions;
+    public string GameScene;
 
     public void OnStartClicked()
     {
@@ -29,7 +30,7 @@ public class MenuManager : MonoBehaviour
                 PlayerPrefs.SetString("Player_" + i, selectedPions[i]);
             }
 
-            SceneManager.LoadScene("GameScene");
+            SceneManager.LoadScene(GameScene);
         }
         else
         {

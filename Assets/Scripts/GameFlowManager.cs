@@ -18,7 +18,7 @@ public class GameFlowManager : MonoBehaviour
     // Obstacles
     void ShowObstaclesStep()
     {
-        generator.GenerateObstacles();
+        generator.GenerateLevel();
         BobText.text = generator.obstacleAnnouncement;
 
         NextButton.onClick.RemoveAllListeners();
