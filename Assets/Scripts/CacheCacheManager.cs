@@ -146,7 +146,6 @@ public class CacheCacheManager : MonoBehaviour
         }
         else
         {
-            // Raté : on incrémente le total, peu importe ce qui s'est passé avant
             totalMisses++;
         }
 

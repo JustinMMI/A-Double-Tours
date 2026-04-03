@@ -60,7 +60,6 @@ public class CacheCacheUI : MonoBehaviour
             $"<b>{hiderName}</b>, choisis ton buisson !";
     }
 
-    /// <summary>attemptsLeft = nombre de ratés consécutifs encore autorisés avant défaite.</summary>
     public void ShowSeekerSelection(string seekerName, HashSet<int> disabledBushes, int attemptsLeft)
     {
         StopCountdownIfRunning();
@@ -70,7 +69,7 @@ public class CacheCacheUI : MonoBehaviour
         ApplyDisabledBushes(disabledBushes);
 
         string attemptsWarning = attemptsLeft == 1
-            ? "\n<color=#FF6666>⚠ Dernier essai avant défaite !</color>"
+            ? "\n<color=#FF6666> Dernier essai avant défaite !</color>"
             : "";
 
         instructionText.text =
@@ -114,20 +113,23 @@ public class CacheCacheUI : MonoBehaviour
         }
 
         System.Text.StringBuilder sb = new System.Text.StringBuilder();
-        sb.AppendLine($"<b>{seekerName}</b> a fouillé le buisson {seekerBushIndex + 1}.\n");
 
         if (caught.Count > 0)
-            sb.AppendLine($"Éliminé(s) : <b>{string.Join(", ", caught)}</b>");
+            sb.AppendLine($" <b>{string.Join(", ", caught)}</b> à été éliminé(s)");
         else
-            sb.AppendLine("Personne dans ce buisson !");
+            sb.AppendLine("Il n'y a personne dans ce buisson !");
 
-        if (escaped.Count > 0)
-            sb.AppendLine($"\nEncore caché(s) : <b>{string.Join(", ", escaped)}</b>");
+        if (escaped.Count > 1)
+            sb.AppendLine($"<b>{string.Join(", ", escaped)}</b> sont encore cachés");
+        else
+            sb.AppendLine($"<b>{string.Join(", ", escaped)}</b> est encore caché");
 
         if (seekerWins)
             sb.AppendLine("\n<b>Le chasseur a trouvé tout le monde !</b>");
+
         else if (seekerLoses)
-            sb.AppendLine("\n<b>Les cacheurs ont gagné ! Le chasseur a raté 2 fois de suite.</b>");
+            sb.AppendLine("\n<b>Les cacheurs ont gagné !</b>");
+            
         else if (!canContinue)
             sb.AppendLine("\n<b>Les cacheurs restants ont gagné !</b>");
 
@@ -151,6 +153,7 @@ public class CacheCacheUI : MonoBehaviour
     private IEnumerator ShowCountdown(int seconds)
     {
         countdownText.gameObject.SetActive(true);
+        instructionText.gameObject.SetActive(false);
 
         for (int i = seconds; i >= 1; i--)
         {
@@ -159,6 +162,8 @@ public class CacheCacheUI : MonoBehaviour
         }
 
         countdownText.gameObject.SetActive(false);
+        instructionText.gameObject.SetActive(true);
+
         countdownCoroutine = null;
     }
 
