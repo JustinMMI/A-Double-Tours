@@ -5,6 +5,26 @@ using System.Collections.Generic;
 public class DuelManager : MonoBehaviour
 {
     public List<PionSelector> duelPions;
+    private int lastEventIndex = -1;
+
+    [Header("Consequences Settings")]
+
+    public string[] consequences =
+    {
+    };
+
+    private int GetRandomConsequenceIndex()
+    {
+        int randomIndex = Random.Range(0, consequences.Length);
+
+        while (randomIndex == lastEventIndex)
+        {
+            randomIndex = Random.Range(0, consequences.Length);
+        }
+
+        lastEventIndex = randomIndex;
+        return randomIndex;
+    }
 
     public void OnConfirmDuel()
     {
@@ -53,11 +73,11 @@ public class DuelManager : MonoBehaviour
             }
         }
 
-        Debug.Log("4. TOUT EST OK ! Lancement du duel...");
-
         string winner = selectedForDuel[Random.Range(0, 2)];
+
         PlayerPrefs.SetString("DuelWinner", winner);
         PlayerPrefs.SetInt("FromDuel", 1);
+        PlayerPrefs.SetInt("ConsequenceIndex", GetRandomConsequenceIndex());
 
         SceneManager.LoadScene("GameScene");
     }
