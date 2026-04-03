@@ -1,52 +1,76 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class DuelMashing : MonoBehaviour
 {
+    [Header("Interface UI")]
     public Slider barreDuel;
+    public TextMeshProUGUI texteInfo; // Le texte qui affiche les règles PUIS le gagnant
+    public Button boutonBleu;
+    public Button boutonRouge;
+    public GameObject boutonRejouer;
 
     [Header("Réglages")]
     public float scoreGlobal = 50f;
-    public float forceImpact = 10f; // Puissance d'un clic sur le bouton
+    public float forceImpact = 10f;
 
     void Start()
     {
-        if (barreDuel != null)
-        {
-            barreDuel.minValue = 0;
-            barreDuel.maxValue = 100;
-            barreDuel.value = scoreGlobal;
-            barreDuel.interactable = false;
-        }
+        InitialiserJeu();
     }
 
-    // FONCTION POUR LE BOUTON BLEU
+    public void InitialiserJeu()
+    {
+        scoreGlobal = 50f;
+        barreDuel.value = scoreGlobal;
+
+        // On affiche les règles (et elles resteront là pendant tout le duel)
+        texteInfo.text = "RÈGLES : Cliquez le plus vite possible pour gagner !";
+
+        boutonRejouer.SetActive(false);
+        ActiverBoutonsJeu(true);
+    }
+
+    // --- ACTIONS DES BOUTONS ---
+
     public void ClickBleu()
     {
         ModifierScore(-forceImpact);
-        Debug.Log("Bouton BLEU cliqué !");
     }
 
-    // FONCTION POUR LE BOUTON ROUGE
     public void ClickRouge()
     {
         ModifierScore(forceImpact);
-        Debug.Log("Bouton ROUGE cliqué !");
     }
+
+    // --- LOGIQUE ---
 
     void ModifierScore(float valeur)
     {
+        // Si le jeu est fini, on ne fait plus rien
+        if (boutonRejouer.activeSelf) return;
+
         scoreGlobal += valeur;
         scoreGlobal = Mathf.Clamp(scoreGlobal, 0, 100);
         barreDuel.value = scoreGlobal;
 
-        if (scoreGlobal <= 0) { Debug.Log("VICTOIRE BLEUE"); FinDeMatch(); }
-        if (scoreGlobal >= 100) { Debug.Log("VICTOIRE ROUGE"); FinDeMatch(); }
+        if (scoreGlobal <= 0) TerminerPartie("L'ÉQUIPE BLEUE A GAGNÉ !");
+        if (scoreGlobal >= 100) TerminerPartie("L'ÉQUIPE ROUGE A GAGNÉ !");
     }
 
-    void FinDeMatch()
+    void TerminerPartie(string messageGagnant)
     {
-        // Optionnel : On peut désactiver les boutons ici pour ne plus cliquer
-        Debug.Log("Le match est terminé !");
+        // Le texte des règles est ENFIN remplacé par le message de victoire
+        texteInfo.text = messageGagnant;
+
+        boutonRejouer.SetActive(true);
+        ActiverBoutonsJeu(false);
+    }
+
+    void ActiverBoutonsJeu(bool etat)
+    {
+        boutonBleu.interactable = etat;
+        boutonRouge.interactable = etat;
     }
 }
