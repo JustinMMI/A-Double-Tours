@@ -9,17 +9,28 @@ public class ChronoGame : MonoBehaviour
 
     private float chrono = 0f;
     private bool tourne = false;
+    private bool enAttente = true;
 
     private int joueurActuel = 1;
-    private List<float> scores = new List<float>(); // Liste pour stocker les chronos
+    private List<float> scores = new List<float>();
     private bool jeuTermine = false;
+
+    // La règle affichée en permanence en haut
+    private string regle = "<color=#FFFF00><size=120%>OBJECTIF : 10.000 secondes !</size></color>\n--------------------------\n";
+
+    void Start()
+    {
+        AfficherMessage("JOUEUR 1\nCliquez pour LANCER");
+    }
 
     void Update()
     {
         if (tourne)
         {
             chrono += Time.deltaTime;
-            affichage.text = "Joueur " + joueurActuel + "\n" + (chrono < 3f ? chrono.ToString("F2") : "???");
+            // Le chrono se cache après 3 secondes
+            string tempsVisible = (chrono < 3f ? chrono.ToString("F3") : "???");
+            AfficherMessage("JOUEUR " + joueurActuel + "\n<size=150%>" + tempsVisible + "s</size>");
         }
     }
 
@@ -31,11 +42,13 @@ public class ChronoGame : MonoBehaviour
             return;
         }
 
-        if (!tourne)
+        if (enAttente)
         {
+            enAttente = false;
             tourne = true;
+            chrono = 0f;
         }
-        else
+        else if (tourne)
         {
             ArreterTour();
         }
@@ -44,13 +57,13 @@ public class ChronoGame : MonoBehaviour
     void ArreterTour()
     {
         tourne = false;
-        scores.Add(chrono); // On enregistre le temps
+        scores.Add(chrono);
 
         if (joueurActuel < 4)
         {
             joueurActuel++;
-            chrono = 0f;
-            affichage.text = "Score enregistre !\nAu tour du Joueur " + joueurActuel;
+            enAttente = true;
+            AfficherMessage("SCORE ENREGISTRE !\n\nJOUEUR " + joueurActuel + "\nCliquez quand vous etes PRET");
         }
         else
         {
@@ -62,20 +75,39 @@ public class ChronoGame : MonoBehaviour
     {
         jeuTermine = true;
 
-        // On calcule l'écart avec 10s pour chaque score
+        // On crée une liste d'objets avec le nom, le temps et l'écart
         var resultats = scores
-            .Select((temps, index) => new { Nom = "J" + (index + 1), Ecart = Mathf.Abs(10f - temps), Temps = temps })
-            .OrderBy(r => r.Ecart) // Le plus petit écart gagne
+            .Select((temps, index) => new {
+                Nom = " - J" + (index + 1),
+                Temps = temps,
+                Ecart = Mathf.Abs(10f - temps)
+            })
+            .OrderBy(r => r.Ecart) // Le plus proche de 10s en premier
             .ToList();
 
-        string texteFinal = "CLASSEMENT FINAL :\n";
+        string podium = "CLASSEMENT FINAL :\n";
+
         for (int i = 0; i < resultats.Count; i++)
         {
-            texteFinal += (i + 1) + ". " + resultats[i].Nom + " (" + resultats[i].Temps.ToString("F2") + "s)\n";
+            string couleur;
+            string prefixe;
+
+            // Attribution des couleurs demandées
+            if (i == 0) { couleur = "#FFD700"; prefixe = "1er"; }      // Jaune Or
+            else if (i == 1) { couleur = "#C0C0C0"; prefixe = "2e"; }  // Gris Argent
+            else if (i == 2) { couleur = "#CD7F32"; prefixe = "3e"; }  // Marron Bronze
+            else { couleur = "#FF4500"; prefixe = "4e"; }              // Rouge
+
+            podium += $"<color={couleur}>{prefixe}{resultats[i].Nom} : {resultats[i].Temps:F3}s (Ecart: {resultats[i].Ecart:F3}s)</color>\n";
         }
 
-        texteFinal += "\nCliquez pour rejouer";
-        affichage.text = texteFinal;
+        podium += "\n<size=80%>Cliquez pour REJOUER</size>";
+        AfficherMessage(podium);
+    }
+
+    void AfficherMessage(string contenu)
+    {
+        affichage.text = regle + contenu;
     }
 
     void RelancerTout()
@@ -85,6 +117,7 @@ public class ChronoGame : MonoBehaviour
         chrono = 0f;
         jeuTermine = false;
         tourne = false;
-        affichage.text = "Joueur 1 : Pret ?";
+        enAttente = true;
+        AfficherMessage("JOUEUR 1\nCliquez pour LANCER");
     }
 }
